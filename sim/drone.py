@@ -1,10 +1,7 @@
 import numpy as np
 from numpy import sin as s, cos as c, tan as t
-import matplotlib.pyplot as plt
-from numpy.core.numerictypes import sctype2char
-from numpy.lib.function_base import angle
-
-from dynamics.parameters import *
+from sim.parameters import *
+from sim.sensors import Sensor
 
 
 class Drone:
@@ -26,35 +23,36 @@ class Drone:
         self.linear_velocity = lambda: np.array([self.vx, self.vy, self.vz]).reshape(3, 1)
         self.angular_velocity = lambda: np.array([self.p, self.q, self.r]).reshape(3, 1)
 
-        # Constants
-        self.k = 0.1
-        self.b = 0.2
-        self.l = 0.5
-
         # Omegas
         self.w1 = 0
         self.w2 = 0
         self.w3 = 0
         self.w4 = 0
 
+        # Inertia Matrix
+        self.inertia = np.diag([IXX, IYY, IZZ])
+        
+        # Drag Matrix
+        self.drag = np.diag([AX, AY, AZ])
+
         # Thrust Vector
         self.thrust = np.array(
             [
                 [0],
                 [0],
-                [self.k*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
+                [K*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
             ])
 
         # Torque Vector
         self.torque = np.array(
             [
-                [self.l*self.k*(-self.w2**2 + self.w4**2)],
-                [self.l*self.k*(-self.w1**2 + self.w3**2)],
-                [self.b*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
+                [L*K*(-self.w2**2 + self.w4**2)],
+                [L*K*(-self.w1**2 + self.w3**2)],
+                [B*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
             ]
         )
         # Drag Force Vector
-        self.fd = 0.5*RHO*CD*A*np.square(self.linear_velocity())
+        self.fd = self.drag@np.square(self.linear_velocity())
 
         # Gravity Vector
         self.gravity = np.array([0, 0, -G]).reshape(-1, 1)
@@ -94,10 +92,9 @@ class Drone:
             ]
         )
 
-        self.inertia = np.diag([IXX, IYY, IZZ])
-
         self.acceleration = np.zeros((3, 1))
 
+        self.sensors = []
     # Function to step, i.e. set the angular velocties, to be called externally by the user
     def __step__(self, velocities):
         self.w1, self.w2, self.w3, self.w4 = velocities[0], velocities[1], velocities[2], velocities[3]
@@ -145,23 +142,24 @@ class Drone:
             [
                 [0],
                 [0],
-                [self.k*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
+                [K*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
             ])
 
         # Torque Vector
         self.torque = np.array(
             [
-                [self.l*self.k*(self.w1**2 - self.w3**2)],
-                [self.l*self.k*(self.w2**2 - self.w4**2)],
-                [self.b*(self.w1**2 - self.w2**2 + self.w3**2 - self.w4**2)]
+                [L*K*(self.w1**2 - self.w3**2)],
+                [L*K*(self.w2**2 - self.w4**2)],
+                [B*(self.w1**2 - self.w2**2 + self.w3**2 - self.w4**2)]
             ]
         )
 
-        self.fd = 0.5*RHO*CD*A*np.square(self.linear_velocity())
+        # Drag Force Vector
+        self.fd = self.drag @ np.square(self.linear_velocity())
 
     def __update_acceleration__(self):
         """Uses the omegas to update acceleration"""
-        self.acceleration = self.gravity + (1/MASS)*self.R@self.thrust # + self.fd
+        self.acceleration = self.gravity + (1/MASS)*self.R@self.thrust #- (1/MASS)*self.fd
 
     def __update_omega_dot__(self):
         """Updates omega_dot to calculate final state vector"""
@@ -219,13 +217,10 @@ class Drone:
             return angle
         return angle
 
-
-
-
-        
-
-        
-
-
-
-        
+    #!--- Attaching Sensors ---!
+    def attach_sensor(self, sensor: Sensor):
+        self.sensors.append(sensor)
+    
+    def list_sensors(self):
+        for sensor in self.sensors:
+            print(sensor.__class__.__name__)
