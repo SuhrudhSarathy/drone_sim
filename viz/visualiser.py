@@ -1,49 +1,46 @@
+"""This file is for visualising the Drone while it is in flight using Matplotlib"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import animation
-from sim import Drone
 
-class UI:
-    def __init__(self, actors=list):
-        self.figure = plt.figure()
-        self.ax = self.figure.add_subplot(projection="3d")
-        self.N = 1000
+from sim.drone import Drone
+from sim.parameters import PLT_PAUSE
 
-        self.actors = actors
+class Graphics:
+    """This only generates the 3D Plot of the ongoing simulation and has multi drone support"""
+    def __init__(self):
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(projection="3d")
 
-        # For now, just plot a 3d spiral
-        t = np.linspace(0, 2*np.pi, self.N)
-        self.coords = np.empty((len(t), 3))
-        for i in range(len(t)):
-            self.coords[i, :] = np.array([np.sin(t[i]), np.cos(t[i]), 0.1*t[i]])
+        self.actors = []
 
-        self.i = 0
-        self.coords = self.coords.T
-        # Just do this after you initialise the plot
-        # self.initialise_plot()
+    def add_actor(self, drone):
+        """This add a Drone for the Graphics object to display"""
+        drone.body.viz_ax = self.ax
+        self.actors.append(drone)
 
-        self.line = self.ax.plot(0, 0, 0)[0]
-        self.ax.set_xlim3d([-0.5, 0.5])
-        self.ax.set_xlabel('X')
+    def plot_background(self):
+        self.ax.set_xlim3d([-5.0, 5.0])
+        self.ax.set_ylim3d([-5.0, 5.0])
+        self.ax.set_zlim3d([-5.0, 5.0])
 
-        self.ax.set_ylim3d([-0.5, 0.5])
-        self.ax.set_ylabel('Y')
+        self.ax.set_xlabel("X")
+        self.ax.set_ylabel("Y")
+        self.ax.set_zlabel("Z")
 
-        self.ax.set_zlim3d([0.0, 3.0])
-        self.ax.set_zlabel('Z')
+        self.ax.set_title("Quadcopter Simulation")
 
-        self.ax.set_title('3D Test')
+    def plot_actors(self):
+        plt.cla()
+        self.plot_background()
+        for actor in self.actors:
+            actor.body.plot_body()
+        plt.pause(PLT_PAUSE)
 
-        self.animation = animation.FuncAnimation(self.figure, self.animate, self.N, interval=1000/self.N, blit=False)
+    def update(self):
+        self.plot_actors()
 
-    def animate(self, num):
-        self.line.set_data(self.coords[0:2, :num])
-        self.line.set_3d_properties(self.coords[2, :num])
 
-        return self.line
 
-if __name__ == "__main__":
-    ui = UI()
 
-    plt.show()

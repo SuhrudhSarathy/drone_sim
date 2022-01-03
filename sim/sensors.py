@@ -1,15 +1,13 @@
 """This file aims to simulate some of the senors for the drone"""
 
 import numpy as np
-
-from sim.drone import Drone
 from sim.parameters import *
 
 class Sensor:
     def __init__(self):
         self.drone = None
 
-    def attach_to(self, drone: Drone):
+    def attach_to(self, drone):
         raise NotImplementedError
 
     def sense(self):
@@ -31,7 +29,7 @@ class PositionTracker(Sensor):
             self.mean = 0
             self.std_dev = 0
 
-    def attach_to(self, drone: Drone):
+    def attach_to(self, drone):
         self.drone = drone
         self.drone.attach_sensor(self)
 
@@ -65,7 +63,7 @@ class IMU(Sensor):
         self.gyroy_bias += (IMU_MEANS["gyroy"] + np.random.randn() * IMU_STDDEV["gyroy"])*DT
         self.gyroz_bias += (IMU_MEANS["gyroz"] + np.random.randn() * IMU_STDDEV["gyroz"])*DT
 
-    def attach_to(self, drone: Drone):
+    def attach_to(self, drone):
         self.drone = drone
         self.drone.attach_sensor(self)
         

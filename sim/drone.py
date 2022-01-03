@@ -1,13 +1,12 @@
 import numpy as np
 from numpy import sin as s, cos as c, tan as t
 from sim.parameters import *
-from sim.sensors import Sensor
-
+from viz.logger import T
 
 class Drone:
-    def __init__(self):
+    def __init__(self, enable_death=True):
         # Position
-        self.x, self.y, self.z = 0, 0, 0
+        self.x, self.y, self.z = 0, 0, 0.5
 
         # Roll Pitch Yaw
         self.phi, self.theta, self.psi = 0, 0, 0
@@ -95,11 +94,39 @@ class Drone:
         self.acceleration = np.zeros((3, 1))
 
         self.sensors = []
-    # Function to step, i.e. set the angular velocties, to be called externally by the user
+        self.body = None
+
+        # Death
+        self.enable_death = enable_death
+
+    def __reset__(self):
+        """Call this function to reset the simulation. This is called in function method"""
+        # Position
+        self.x, self.y, self.z = 0, 0, 0.5
+
+        # Roll Pitch Yaw
+        self.phi, self.theta, self.psi = 0, 0, 0
+
+        # Linear velocities
+        self.vx, self.vy, self.vz = 0, 0, 0
+
+        # Angular Velocities
+        self.p, self.q, self.r = 0, 0, 0
+
+        print("LOG: The Drone is dead. Reset Simulation")
+    
     def __step__(self, velocities):
+        """Function to step, i.e. set the angular velocties, to be called externally by the user"""
+
         self.w1, self.w2, self.w3, self.w4 = velocities[0], velocities[1], velocities[2], velocities[3]
         # Decide on this, whether, you need to update as soon as you step or not
         self.update()
+
+        if self.enable_death:
+            yield self.death()
+
+        else:
+            yield True
 
     # All State Update functions
     def __update_transformations__(self):
@@ -218,9 +245,33 @@ class Drone:
         return angle
 
     #!--- Attaching Sensors ---!
-    def attach_sensor(self, sensor: Sensor):
+    def attach_sensor(self, sensor):
+        """This is called when a sensor is added to the drone"""
         self.sensors.append(sensor)
     
     def list_sensors(self):
+        """Can be used to list the sensors placed on the drone"""
         for sensor in self.sensors:
             print(sensor.__class__.__name__)
+
+    #!--- Attach Body ---!
+    def attach_body(self, body):
+        """This is called to attach a body to the drone, i.e. use this to visualise the drone"""
+        self.body = body
+
+    #!--- Death Constraints ---#
+    def death(self):
+        """This function is used to terminate the simulation. This can be enabled or disabled in the constuctor
+        If a death condition is reached, the simulation is reset."""
+        
+        # Condition 1: If the roll or pitch is more than 60 degrees, we reset the simulation
+        if abs(self.phi) > np.radians(60.0) or abs(self.theta) > np.radians(60):
+            self.__reset__()
+            return True
+
+        # Condition 2: If the z altitude goes negative, we reset the simulation
+        if self.z < 0:
+            self.__reset__()
+            return True
+
+        return False

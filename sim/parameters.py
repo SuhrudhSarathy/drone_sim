@@ -1,7 +1,7 @@
 """File to Store common parameters for the drone"""
 
 #! -- Simulation parameters --!
-DT = 0.001
+DT = 0.002
 #! -- ********* --!
 
 #! -- Drone parameters --!
@@ -50,7 +50,7 @@ IMU_STDDEV = {
     "gyroy": 0.1,
     "gyroz": 0.1
 }
+#! -- ********* --!
 
-# if __name__ == "__main__":
-#     print(75000 + 500 + 5000 + 1600 + 1100 + 3500 + 800 + 1300 + 700 + 1800 + 2000 + 500 + 700 + 10000 + 3000 + 4000 + 5000 + 3500)
-#     print(12*75000)
+#! -- Plotting Params --!
+PLT_PAUSE = 1e-6
