@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from sim.drone import Drone
-from sim.parameters import PLT_PAUSE
+from drone_sim.sim.drone import Drone
+from drone_sim.sim.parameters import PLT_PAUSE
 
 class Graphics:
     """This only generates the 3D Plot of the ongoing simulation and has multi drone support"""

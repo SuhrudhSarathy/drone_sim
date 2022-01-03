@@ -1,6 +1,6 @@
 """This file contains drawing of the body"""
-from sim.parameters import *
-from sim.drone import Drone
+from drone_sim.sim.parameters import *
+from drone_sim.sim.drone import Drone
 import numpy as np
 
 class Body:

@@ -2,10 +2,10 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from sim.drone import Drone
-from sim.parameters import NULL_ROT
-from viz.body import Body
-from viz.visualiser import Graphics
+from drone_sim.sim.drone import Drone
+from drone_sim.sim.parameters import NULL_ROT
+from drone_sim.viz.body import Body
+from drone_sim.viz.visualiser import Graphics
 
 drone = Drone(True)
 

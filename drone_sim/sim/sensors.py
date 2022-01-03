@@ -1,7 +1,7 @@
 """This file aims to simulate some of the senors for the drone"""
 
 import numpy as np
-from sim.parameters import *
+from drone_sim.sim.parameters import *
 
 class Sensor:
     def __init__(self):

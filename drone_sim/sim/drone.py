@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import sin as s, cos as c, tan as t
-from sim.parameters import *
+from drone_sim.sim.parameters import *
 
 class Drone:
     def __init__(self, x=0, y=0, z=0.5, enable_death=True):
