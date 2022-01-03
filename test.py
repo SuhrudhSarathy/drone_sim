@@ -15,13 +15,10 @@ ui = Graphics()
 ui.add_actor(drone)
 
 drone.z = 2.5
-drone.vz = 5
 r = 620.2943
 # r = 0
-w1, w2, w3, w4 = 0.9*r, -r, r, -r
+w1, w2, w3, w4 = r, -r, r, -r
 
 for i in range(1000):
-    death = drone.__step__([w1, w2, w3, w4])
+    drone.__step__([w1, w2, w3, w4])
     ui.update()
-    if death:
-        break

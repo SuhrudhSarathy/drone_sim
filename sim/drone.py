@@ -1,12 +1,11 @@
 import numpy as np
 from numpy import sin as s, cos as c, tan as t
 from sim.parameters import *
-from viz.logger import T
 
 class Drone:
-    def __init__(self, enable_death=True):
+    def __init__(self, x=0, y=0, z=0.5, enable_death=True):
         # Position
-        self.x, self.y, self.z = 0, 0, 0.5
+        self.x, self.y, self.z = x, y, z
 
         # Roll Pitch Yaw
         self.phi, self.theta, self.psi = 0, 0, 0
@@ -123,10 +122,7 @@ class Drone:
         self.update()
 
         if self.enable_death:
-            yield self.death()
-
-        else:
-            yield True
+            self.death()
 
     # All State Update functions
     def __update_transformations__(self):
@@ -267,11 +263,7 @@ class Drone:
         # Condition 1: If the roll or pitch is more than 60 degrees, we reset the simulation
         if abs(self.phi) > np.radians(60.0) or abs(self.theta) > np.radians(60):
             self.__reset__()
-            return True
 
         # Condition 2: If the z altitude goes negative, we reset the simulation
         if self.z < 0:
             self.__reset__()
-            return True
-
-        return False
