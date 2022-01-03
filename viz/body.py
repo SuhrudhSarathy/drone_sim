@@ -43,3 +43,5 @@ class Body:
         self.viz_ax.plot([origin[0], lr[0]], [origin[1], lr[1]], [origin[2], lr[2]], color="black")
         self.viz_ax.plot([origin[0], rr[0]], [origin[1], rr[1]], [origin[2], rr[2]], color="green")
 
+        self.viz_ax.scatter([origin[0]], [origin[1]], origin[2], color="yellow", s=2)
+
