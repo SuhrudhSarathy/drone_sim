@@ -1,7 +1,7 @@
 # Drone_Sim [WIP]
 A simple drone dynamics simulation written in python. [Work in Progress]
 
-## Installion Instructions
+## Installation Instructions
 1. Clone this repository
 2. [For Now] add the repository to your python path. This will enable Python to access this folder as a python package. To add this repo to your Python path:
 - Add it to your `.bashrc` or `.zshrc`:
