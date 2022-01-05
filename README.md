@@ -9,8 +9,11 @@ This branch contains he build and distribution files for the Drone_Sim. [Work in
   
    filename= .whl(wheel) distribution file in the dist folder
    
----------------------------_or_-------------------------------------
+---------------------------_or_------------------------------------
 
 -  Open the command line and run the following command
 
    `python -m pip install git+<repository link>`
+   
+   ##### If the installation, doesn't work try updating the pip by running the following command
+   `python -m pip install --upgrade pip`
