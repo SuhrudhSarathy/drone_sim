@@ -117,7 +117,7 @@ class Drone:
     def __step__(self, velocities):
         """Function to step, i.e. set the angular velocties, to be called externally by the user"""
 
-        self.w1, self.w2, self.w3, self.w4 = velocities[0], velocities[1], velocities[2], velocities[3]
+        self.w1, self.w2, self.w3, self.w4 = velocities[0], -velocities[1], velocities[2], -velocities[3]
         # Decide on this, whether, you need to update as soon as you step or not
         self.update()
 
