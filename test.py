@@ -1,11 +1,9 @@
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
-from drone_sim.sim.drone import Drone
+"""Tests a multidrone simulation"""
+from drone_sim.sim import Drone
 from drone_sim.sim.parameters import NULL_ROT
-from drone_sim.viz.body import Body
-from drone_sim.viz.visualiser import Graphics
+from drone_sim.viz import Body
+from drone_sim.viz import Graphics
 
 drone = Drone(True)
 drone.z = 2.5
@@ -31,5 +29,5 @@ w1, w2, w3, w4 = r, r, r, r
 
 for i in range(1050):
 
-    drone.__step__([w1, w2, w3, w4])
+    drone.step([w1, w2, w3, w4])
     ui.update()
