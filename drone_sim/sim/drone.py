@@ -114,7 +114,7 @@ class Drone:
 
         print("LOG: The Drone is dead. Reset Simulation")
     
-    def __step__(self, velocities):
+    def step(self, velocities):
         """Function to step, i.e. set the angular velocties, to be called externally by the user"""
 
         self.w1, self.w2, self.w3, self.w4 = velocities[0], -velocities[1], velocities[2], -velocities[3]
