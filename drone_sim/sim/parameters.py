@@ -53,4 +53,4 @@ IMU_STDDEV = {
 #! -- ********* --!
 
 #! -- Plotting Params --!
-PLT_PAUSE = 1e-6
+PLT_PAUSE = 1e-4

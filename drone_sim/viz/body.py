@@ -25,6 +25,12 @@ class Body:
         self.drone = drone
         self.drone.attach_body(self)
 
+        self.trajectory = {
+            "X": [self.drone.x],
+            "Y": [self.drone.y],
+            "Z": [self.drone.z]
+        }
+
     def plot_body(self):
         assert self.drone is not None, "Add the body to a Drone"
         assert self.viz_ax is not None, "Don't know where to plot. Pass the axes when constructing the Object"
@@ -44,4 +50,12 @@ class Body:
         self.viz_ax.plot([origin[0], rr[0]], [origin[1], rr[1]], [origin[2], rr[2]], color="green")
 
         self.viz_ax.scatter([origin[0]], [origin[1]], origin[2], color="yellow", s=2)
+
+    def update_trajectory(self):
+        self.trajectory["X"].append(self.drone.x)
+        self.trajectory["Y"].append(self.drone.y)
+        self.trajectory["Z"].append(self.drone.z)
+
+    def plot_trajectory(self):
+        self.viz_ax.plot(self.trajectory["X"], self.trajectory["Y"], self.trajectory["Z"], "gray")
 
