@@ -44,9 +44,9 @@ class Drone:
         # Torque Vector
         self.torque = np.array(
             [
-                [L*K*(-self.w2**2 + self.w4**2)],
-                [L*K*(-self.w1**2 + self.w3**2)],
-                [B*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
+                [L*K*(self.w1**2 - self.w3**2)],
+                [L*K*(self.w2**2 - self.w4**2)],
+                [B*(self.w1**2 - self.w2**2 + self.w3**2 - self.w4**2)]
             ]
         )
         # Drag Force Vector
