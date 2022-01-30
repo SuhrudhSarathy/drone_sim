@@ -50,7 +50,7 @@ class Drone:
             ]
         )
         # Drag Force Vector
-        self.fd = self.drag@np.square(self.linear_velocity())
+        self.fd = -self.drag@self.linear_velocity()
 
         # Gravity Vector
         self.gravity = np.array([0, 0, -G]).reshape(-1, 1)
@@ -178,11 +178,11 @@ class Drone:
         )
 
         # Drag Force Vector
-        self.fd = self.drag @ np.square(self.linear_velocity())
+        self.fd = -self.drag @ self.linear_velocity()
 
     def __update_acceleration__(self):
         """Uses the omegas to update acceleration"""
-        self.acceleration = self.gravity + (1/MASS)*self.R@self.thrust #- (1/MASS)*self.fd
+        self.acceleration = self.gravity + (1/MASS)*self.R@self.thrust + (1/MASS)*self.fd
 
     def __update_omega_dot__(self):
         """Updates omega_dot to calculate final state vector"""

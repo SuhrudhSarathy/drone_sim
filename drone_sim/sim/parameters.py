@@ -1,7 +1,7 @@
 """File to Store common parameters for the drone"""
 
 #! -- Simulation parameters --!
-DT = 0.002
+DT = 0.004
 #! -- ********* --!
 
 #! -- Drone parameters --!
@@ -53,4 +53,4 @@ IMU_STDDEV = {
 #! -- ********* --!
 
 #! -- Plotting Params --!
-PLT_PAUSE = 1e-4
+PLT_PAUSE = 1e-6
