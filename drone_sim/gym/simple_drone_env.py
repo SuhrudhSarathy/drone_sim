@@ -32,7 +32,7 @@ class SimpleDroneEnv(gym.Env):
         
         # Define action and observation space
         # We will use a continous action space for the values of the motor's rotation
-        self.action_space = spaces.Box(low=0, high=4*NULL_ROT, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32)
         self.observation_space = spaces.Box(low=self.obs_low, high=self.obs_high, shape=(3, 3), dtype=np.float32)
         self.reward_range = (0, 100)
 
@@ -43,7 +43,7 @@ class SimpleDroneEnv(gym.Env):
         assert self.action_space.contains(action), f"{action} doesnot exist in the action space"
 
         # The action is of the type (w1, w2, w3, w4)
-        self.drone.__step__(action)
+        self.drone.step(action*NULL_ROT)
 
 
         # Function has to return the observations
@@ -65,14 +65,21 @@ class SimpleDroneEnv(gym.Env):
         if abs(self.drone.phi) > np.radians(60.0) or abs(self.drone.theta) > np.radians(60):
             done = True
             self.drone.__reset__()
+            reward -= 5
 
         # Condition 2: If the z altitude goes negative, we reset the simulation
         elif self.drone.z < 0:
             done = True
             self.drone.__reset__()
+            reward -= 5
+
+        elif dist_to_go < 0.01:
+            done = True
+            reward += 10
         
         else:
             done = False
+
 
         return observation, reward, done, {}
 
