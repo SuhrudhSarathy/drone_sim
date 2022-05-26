@@ -4,6 +4,8 @@ import os
 
 project_name = "drone_sim"
 
+requirements = open('requirements.txt').read().splitlines()
+
 setup(
     name=project_name,
     version="0.1.0",
@@ -12,6 +14,7 @@ setup(
     author_email="suhrudhsarathy@gmail.com",
     description="Light-weight Simulator for Drones",
     license="MIT",
+    install_requires=requirements,
     packages=[
         project_name,
         join(project_name, "gym"),
