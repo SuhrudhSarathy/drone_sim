@@ -33,22 +33,34 @@ class Drone:
         # Drag Matrix
         self.drag = np.diag([AX, AY, AZ])
 
+
+        # Torque Matrix
+        self.torque_matrix = np.array(
+            [
+                [0, L, 0, -L],
+                [-L, 0, L, 0],
+                [GAMMA, -GAMMA, GAMMA, -GAMMA]
+            ]
+        )
         # Thrust Vector
         self.thrust = np.array(
             [
                 [0],
                 [0],
-                [K*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
+                [KF*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
             ])
 
         # Torque Vector
-        self.torque = np.array(
+        T = np.array(
             [
-                [L*K*(self.w1**2 - self.w3**2)],
-                [L*K*(self.w2**2 - self.w4**2)],
-                [B*(self.w1**2 - self.w2**2 + self.w3**2 - self.w4**2)]
+                [KF*self.w1**2],
+                [KF*self.w2**2],
+                [KF*self.w3**2],
+                [KF*self.w4**2]
             ]
         )
+        self.torque = self.torque_matrix @ T
+
         # Drag Force Vector
         self.fd = -self.drag@self.linear_velocity()
 
@@ -58,17 +70,17 @@ class Drone:
         # Transformation Matrices
         self.R_phi = np.array(
             [
-                [c(self.phi), -s(self.phi), 0],
-                [s(self.phi), c(self.phi), 0],
-                [0, 0, 1]
+                [1, 0, 0],
+                [0, c(self.phi), -s(self.phi)],
+                [0, s(self.phi), c(self.phi)]
             ]
         )
 
         self.R_theta = np.array(
             [
-                [1, 0, 0],
-                [0, c(self.theta), -s(self.theta)],
-                [0, s(self.theta), c(self.theta)]
+                [c(self.theta), 0, -s(self.theta)],
+                [0, 1, 0],
+                [-s(self.theta), 0, c(self.theta)]
             ]
         )
 
@@ -80,15 +92,7 @@ class Drone:
             ]
         )
 
-        self.R = self.R_phi @ self.R_theta @ self.R_psi
-
-        self.W =np.array(
-            [
-                [1, 0, -s(self.theta)],
-                [0, c(self.phi), c(self.theta)*s(self.phi)],
-                [0, -s(self.phi), c(self.theta)*c(self.phi)]
-            ]
-        )
+        self.R = self.R_psi @ self.R_theta @ self.R_phi
 
         self.acceleration = np.zeros((3, 1))
 
@@ -117,7 +121,7 @@ class Drone:
     def step(self, velocities):
         """Function to step, i.e. set the angular velocties, to be called externally by the user"""
 
-        self.w1, self.w2, self.w3, self.w4 = velocities[0], -velocities[1], velocities[2], -velocities[3]
+        self.w1, self.w2, self.w3, self.w4 = velocities[0], velocities[1], velocities[2], velocities[3]
         # Decide on this, whether, you need to update as soon as you step or not
         self.update()
 
@@ -128,17 +132,17 @@ class Drone:
     def __update_transformations__(self):
         self.R_phi = np.array(
             [
-                [c(self.phi), -s(self.phi), 0],
-                [s(self.phi), c(self.phi), 0],
-                [0, 0, 1]
+                [1, 0, 0],
+                [0, c(self.phi), -s(self.phi)],
+                [0, s(self.phi), c(self.phi)]
             ]
         )
 
         self.R_theta = np.array(
             [
-                [1, 0, 0],
-                [0, c(self.theta), -s(self.theta)],
-                [0, s(self.theta), c(self.theta)]
+                [c(self.theta), 0, -s(self.theta)],
+                [0, 1, 0],
+                [s(self.theta), 0, c(self.theta)]
             ]
         )
 
@@ -151,50 +155,52 @@ class Drone:
         )
 
         self.R = self.R_phi @ self.R_theta @ self.R_psi
-        
-        self.W =np.array(
-            [
-                [1, 0, -s(self.theta)],
-                [0, c(self.phi), c(self.theta)*s(self.phi)],
-                [0, -s(self.phi), c(self.theta)*c(self.phi)]
-            ]
-        )
 
     def __update_thrust_and_torque__(self):
         self.thrust = np.array(
             [
                 [0],
                 [0],
-                [K*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
+                [KF*(self.w1**2 + self.w2**2 + self.w3**2 + self.w4**2)]
             ])
 
-        # Torque Vector
-        self.torque = np.array(
+        T = np.array(
             [
-                [L*K*(self.w1**2 - self.w3**2)],
-                [L*K*(self.w2**2 - self.w4**2)],
-                [B*(self.w1**2 - self.w2**2 + self.w3**2 - self.w4**2)]
+                [KF*self.w1**2],
+                [KF*self.w2**2],
+                [KF*self.w3**2],
+                [KF*self.w4**2]
             ]
         )
-
+        self.torque = self.torque_matrix @ T
+        print(self.torque)
         # Drag Force Vector
         self.fd = -self.drag @ self.linear_velocity()
 
     def __update_acceleration__(self):
         """Uses the omegas to update acceleration"""
-        self.acceleration = self.gravity + (1/MASS)*self.R@self.thrust + (1/MASS)*self.fd
+        self.acceleration = self.gravity + (1/MASS)*self.R@self.thrust # + (1/MASS)*self.fd
 
     def __update_omega_dot__(self):
         """Updates omega_dot to calculate final state vector"""
         ang_vel = self.angular_velocity()
-        cross_pdt = np.cross(ang_vel.reshape(3,), (self.inertia@ang_vel).reshape(3,)).reshape(3, 1)
-        MM = self.torque - cross_pdt
-
-        w_dot = np.linalg.inv(self.inertia)@MM
+        pdt = self.inertia @ ang_vel
+        p, q, r = ang_vel[0][0], ang_vel[1][0], ang_vel[2][0]
+        p_, q_, r_ = pdt[0][0], pdt[1][0], pdt[2][0]
         
+        omega = [p, q, r]
+        omega_ = [p_, q_, r_]
+
+        vec = np.cross(omega, omega_)
+
+        MM = self.torque - vec.reshape(3, 1)
+        w_dot = np.linalg.inv(self.inertia) @ MM
+
         self.p = w_dot[0][0]
         self.q = w_dot[1][0]
         self.r = w_dot[2][0]
+
+        print(self.p, self.q, self.r)
     
     def update(self):
         """This function is called everytime to update the state of the system"""
@@ -206,7 +212,7 @@ class Drone:
         self.__update_acceleration__()
         self.__update_omega_dot__()
 
-        angle = self.angular_position() + self.angular_velocity() * DT
+        angle = self.angular_position() + self.R * self.angular_velocity() * DT
 
         # Set the angles
         self.phi = self.normalise_theta(angle[0][0])
@@ -220,7 +226,7 @@ class Drone:
         self.vy = vel[1][0]
         self.vz = vel[2][0]
 
-        position = self.linear_position() + self.linear_velocity() * DT
+        position = self.linear_position() + self.R @ self.linear_velocity() * DT
 
         # set the positions
         self.x = position[0][0]
@@ -262,8 +268,10 @@ class Drone:
         
         # Condition 1: If the roll or pitch is more than 60 degrees, we reset the simulation
         if abs(self.phi) > np.radians(60.0) or abs(self.theta) > np.radians(60):
+            print("Condition 1: If the roll or pitch is more than 60 degrees, we reset the simulation")
             self.__reset__()
 
         # Condition 2: If the z altitude goes negative, we reset the simulation
         if self.z < 0:
+            print("Condition 2: If the z altitude goes negative, we reset the simulation")
             self.__reset__()

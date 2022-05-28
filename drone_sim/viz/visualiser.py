@@ -9,9 +9,10 @@ from drone_sim.sim.parameters import PLT_PAUSE
 
 class Graphics:
     """This only generates the 3D Plot of the ongoing simulation and has multi drone support"""
-    def __init__(self):
+    def __init__(self, set_limits: bool = False):
         self.fig = plt.figure(figsize=(12, 8))
         self.ax = self.fig.add_subplot(projection="3d")
+        self.set_limits = set_limits
 
         self.actors = []
 
@@ -21,9 +22,11 @@ class Graphics:
         self.actors.append(drone)
 
     def plot_background(self):
-        self.ax.set_xlim3d([-5.0, 15.0])
-        self.ax.set_ylim3d([-5.0, 15.0])
-        self.ax.set_zlim3d([-1.0, 5.0])
+
+        if self.set_limits:
+            self.ax.set_xlim3d([-1.0, 5.0])
+            self.ax.set_ylim3d([-1.0, 5.0])
+            self.ax.set_zlim3d([-1.0, 5.0])
 
         self.ax.set_xlabel("X")
         self.ax.set_ylabel("Y")
@@ -36,8 +39,8 @@ class Graphics:
         self.plot_background()
         for actor in self.actors:
             actor.body.plot_body()
-            actor.body.update_trajectory()
-            actor.body.plot_trajectory()
+            # actor.body.update_trajectory()
+            # actor.body.plot_trajectory()
         plt.pause(PLT_PAUSE)
 
     def update(self):

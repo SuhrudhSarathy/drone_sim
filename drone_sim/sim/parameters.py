@@ -1,23 +1,24 @@
 """File to Store common parameters for the drone"""
 
 #! -- Simulation parameters --!
-DT = 0.004
+DT = 0.01
 #! -- ********* --!
 
 #! -- Drone parameters --!
-MASS = 0.468
+MASS = 0.65
 RADIUS_PROP = 0.1
-K = 2.980e-6
-B = 1.140e-7
-L = 0.225
+KF = 3.13e-5
+KM = 7.5e-7
+GAMMA = KM/KF
+L = 0.23
 G = 9.8
 
-NULL_ROT = 620.2943
+NULL_ROT = ((MASS*G/(4*KF))**0.5)
 
 # Inertia
-IXX = 4.856e-3
-IYY = 4.856e-3
-IZZ = 8.801e-3
+IXX = 7.5e-3
+IYY = 7.5e-3
+IZZ = 1.3e-2
 
 # Drag
 AX = 0.25

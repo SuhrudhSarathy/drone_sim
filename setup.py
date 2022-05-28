@@ -20,6 +20,7 @@ setup(
         join(project_name, "gym"),
         join(project_name, "sim"),
         join(project_name, "viz"),
+        join(project_name, "control")
     ],
     zip_safe=True
 )
